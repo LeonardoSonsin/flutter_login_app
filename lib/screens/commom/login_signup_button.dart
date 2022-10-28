@@ -32,7 +32,8 @@ class LoginSignButton extends StatelessWidget {
                   : RegisterController.instance.registerUser(
                       context,
                       registerController!.email.text.trim(),
-                      registerController!.password.text.trim());
+                      registerController!.password.text.trim(),
+                      registerController!.name.text.trim());
             }
           },
           style: ElevatedButton.styleFrom(

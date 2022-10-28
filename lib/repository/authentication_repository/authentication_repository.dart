@@ -23,16 +23,16 @@ class AuthenticationRepository extends GetxController {
   _setInitialScreen(User? user) {
     user == null
         ? Get.offAll(() => const LoginScreen())
-        : Get.offAll(() => HomeScreen());
+        : Get.offAll(() => const HomeScreen());
   }
 
   Future<void> createUserWithEmailAndPassword(
-      BuildContext context, String email, String password) async {
+      BuildContext context, String email, String password, String name) async {
     try {
       await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       firebaseUser.value != null
-          ? Get.offAll(() => HomeScreen())
+          ? Get.offAll(() => const HomeScreen())
           : Get.to(() => const LoginScreen());
     } on FirebaseAuthException catch (e) {
       final ex = SignUpWithEmailAndPasswordFailure.code(e.code);
@@ -50,13 +50,11 @@ class AuthenticationRepository extends GetxController {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       firebaseUser.value != null
-          ? Get.offAll(() => HomeScreen())
+          ? Get.offAll(() => const HomeScreen())
           : Get.to(() => const LoginScreen());
     } on FirebaseAuthException catch (e) {
       final ex = SignUpWithEmailAndPasswordFailure.code(e.code);
       showExceptionDialog(context, content: ex.message);
-      print(e.code);
-      print(e.message);
     } catch (_) {
       const ex = SignUpWithEmailAndPasswordFailure();
       showExceptionDialog(context, content: ex.message);

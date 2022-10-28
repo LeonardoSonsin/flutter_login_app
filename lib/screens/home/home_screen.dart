@@ -1,19 +1,41 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 import '../../repository/authentication_repository/authentication_repository.dart';
 import '../commom/on_back_pressed_dialog.dart';
 
-class HomeScreen extends StatelessWidget {
-  HomeScreen({Key? key}) : super(key: key);
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
 
-  final _auth = FirebaseAuth.instance;
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String name = ' ';
+  String email = ' ';
+  late DocumentSnapshot snapshot;
+
+  Future<void> getData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(user?.uid)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot.exists) {
+        snapshot = documentSnapshot;
+        name = snapshot['name'];
+        email = snapshot['email'];
+        setState(() {});
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    User user = _auth.currentUser!;
-
+    getData();
     return WillPopScope(
       onWillPop: () async {
         final shouldPop = await showReturnAlertDialog(context);
@@ -26,11 +48,11 @@ class HomeScreen extends StatelessWidget {
             children: [
               UserAccountsDrawerHeader(
                 currentAccountPicture: CircleAvatar(
-                  child: Text(user.email![0].toUpperCase(),
+                  child: Text(name[0].toUpperCase(),
                       style: const TextStyle(fontSize: 30.0)),
                 ),
-                accountName: Text(user.uid),
-                accountEmail: Text(user.email!),
+                accountName: Text(name),
+                accountEmail: Text(email),
               ),
               ListTile(
                 onTap: () {
